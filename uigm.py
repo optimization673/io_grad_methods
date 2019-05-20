@@ -4,7 +4,6 @@ from scipy.optimize import approx_fprime
 
 Y0     = 0
 STEP   = 0.15
-L = 36
 
 def FastDualAveraging(target, x0, eps, set_type = "rn", grad = approx_fprime, step = lambda k: STEP, alpha = lambda k : 1/L):
     index = 0
@@ -32,16 +31,22 @@ def FastDualAveraging(target, x0, eps, set_type = "rn", grad = approx_fprime, st
         #z_k+1
         zk.append(alpha(index)*(y_old) + (1 - alpha(index))*zk[index - 1])
         #exit condition
-        if norm(y_new - y_old, ord = 2) < eps :
-            return xk
+        #print(norm(y_new - y_old, ord = 2))
+        #print(norm(zk[index] - zk[index-1], ord = 2))
+        #if norm(zk[index] - zk[index-1], ord = 2) < eps/2 :
+        #    return zk
+        if index >= 10000 :
+            return zk
         
 
 
-def Gradient(target, x0, eps, set_type = "rn", grad = approx_fprime):
+def Gradient(target, x0, eps, L, set_type = "rn", grad = approx_fprime):
     xk = [x0]
     index = 0
     while True:
         index += 1
-        xk.append(xk[index - 1] - 2/(L)*grad(xk[index - 1], target, 0.0000001))
-        if norm(xk[index] - xk[index - 1], ord = 2) < eps / 2 :
+        xk.append(xk[index - 1] - 1/L*grad(xk[index - 1], target, 0.0000001))
+        #if norm(xk[index] - xk[index - 1], ord = 2) < eps / 2 :
+        #    return xk
+        if index >= 10000 :
             return xk
